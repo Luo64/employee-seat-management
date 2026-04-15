@@ -218,7 +218,7 @@ select {
 }
 
 .empty {
-  background-color: #eeeeee;
+  background-color: #DCDCDC;
   color: #222;
 }
 
