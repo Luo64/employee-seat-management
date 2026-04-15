@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS seat_management_db;
+USE seat_management_db;
+
 CREATE TABLE seating_chart (
     floor_seat_seq BIGINT AUTO_INCREMENT PRIMARY KEY,
     floor_no INT NOT NULL,
