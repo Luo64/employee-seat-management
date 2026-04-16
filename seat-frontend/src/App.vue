@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { watch } from 'vue'
 
 const seats = ref([])
 const employees = ref([])
 const selectedEmpId= ref('')
 const selectedSeatNo = ref(null)
+const showAssignModal = ref(false)
 const displaySeatNumber = (seatNo) => {
   return seatNo % 100
 }
@@ -70,6 +72,9 @@ const handleSeatClick = async(seat) => {
     return
   }
   selectedSeatNo.value=seat.seatNo
+  setTimeout(() => {
+    showAssignModal.value = true
+  },250)
 }
 
 const assignSeat =async()=>{
@@ -102,9 +107,17 @@ const assignSeat =async()=>{
 
   selectedSeatNo.value = null
   selectedEmpId.value = ''
-
+  showAssignModal.value=false
   await fetchSeats()
 }
+const cancelAssign = () => {
+  showAssignModal.value=false
+  //selectedSeatNo.value=null
+}
+watch(selectedEmpId, () => {
+  selectedSeatNo.value = null
+  showAssignModal.value = false
+})
 
 </script>
 
@@ -160,10 +173,19 @@ const assignSeat =async()=>{
         <span>Selected</span>
       </div>
     </div>
-    <div class="submit-section">
-      <button @click="assignSeat">Submit</button>
+  </div>
+  <div v-if="showAssignModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Confirm Assignment</h3>
+    <p>Employee: {{ selectedEmpId }}</p>
+    <p>Seat: {{ selectedSeatNo }}</p>
+
+    <div class="modal-actions">
+      <button class="submit-btn" @click="assignSeat">Submit</button>
+      <button class="cancel-btn" @click="cancelAssign">Cancel</button>
     </div>
   </div>
+</div>
 </template>
 <style scoped>
 .container {
@@ -250,21 +272,60 @@ select {
   border-radius: 8px;
   display: inline-block;
 }
-.submit-section {
-  margin-top: 24px;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
 }
 
-button {
+.modal-box {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-40px);
+}
+
+.modal-box h3 {
+  margin-bottom: 16px;
+}
+
+.modal-box p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.submit-btn {
   background-color: #0b4ea2;
   color: white;
   border: none;
-  padding: 12px 28px;
-  font-size: 18px;
+  padding: 10px 18px;
   border-radius: 6px;
   cursor: pointer;
 }
 
-button:hover {
-  opacity: 0.9;
+.cancel-btn {
+  background-color: #cccccc;
+  color: black;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 </style>
